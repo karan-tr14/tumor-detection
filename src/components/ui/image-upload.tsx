@@ -1,5 +1,6 @@
 "use client";
 
+import { uploadToDb } from "@/actions/file-upload";
 import { Button } from "@/components/ui/button";
 import { UploadButton } from "@/lib/uploadthing";
 import { ImagePlus, Upload } from "lucide-react";
@@ -37,10 +38,13 @@ export function ImageUpload({
           endpoint="imageUploader"
           onClientUploadComplete={async (res) => {
             setReady(true);
+            setFileid(res[0].fileHash);
             // Do something with the response
-            // await uploadToDb(res[0])
-            console.log("Files: ", res[0]);
             toast.success("Image uploaded successfully");
+            if (res.length > 0) {
+              await uploadToDb(res[0]);
+            }
+            console.log("Files: ", res[0]);
           }}
           className="ut-allowed-content:hidden ut-button:bg-black ut-button:hover:bg-gray-800 ut-button:text-white ut-button:hover:text-white ut-button:rounded-md ut-button:py-2 ut-button:px-4 ut-button:mt-2"
           onUploadError={(error: Error) => {
@@ -53,7 +57,7 @@ export function ImageUpload({
         className="mx-auto flex items-center mt-4"
         size={"lg"}
         onClick={() => {
-          router.push("/analysis");
+          router.push(`/analysis/${fileid}`);
         }}
         disabled={!ready}
       >
